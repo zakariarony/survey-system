@@ -134,6 +134,7 @@
 			$output .= "</ul>";
 		}
 		$output .= "</ul>";
+		$output .= "<li><a href=\"logout.php\">Logout</a></li>";
 		return $output;
 	}
 
@@ -161,7 +162,7 @@
 		return $output;
 	}
 
-    
+   
 
 
 ?>

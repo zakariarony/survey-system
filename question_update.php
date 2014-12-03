@@ -1,7 +1,8 @@
-<?php //require_once("includes/session.php"); ?>
+<?php require_once("includes/session.php"); ?>
 <?php require_once("includes/connection.php"); ?>
 <?php require_once("includes/functions.php"); ?>
-<?php// confirm_logged_in(); ?>
+<?php confirm_logged_in(); ?>
+<?php is_admin(); ?>
 <?php 
 	include_once("includes/form_functions.php");
 	include("includes/header.php"); ?>
@@ -102,7 +103,7 @@
 				</tr>
                 <tr><td>question type: </td>
 					<td><select name="type">
-					<?php foreach (['radio' => 'Radio Button', 'checkbox' => 'CheckBox', 'text' => 'Text'] as $key => $value) : ?>
+					<?php foreach (['radio' => 'Radio Button', 'checkbox' => 'CheckBox'] as $key => $value) : ?>
 					  <option value="<?php echo $key?>" <?php if ($question['type'] == $key) echo 'selected'; ?>><?php echo $value?></option>
 					 <?php endforeach; ?>
 					</select> if see radio button just type "yes" or "no":</td>

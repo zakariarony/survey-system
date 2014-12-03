@@ -26,7 +26,7 @@
 		
 		if ( empty($errors) ) {
 			// Check database to see if username and the hashed password exist there.
-			$query = "SELECT user_id, username ";
+			$query = "SELECT user_id, username, user_type ";
 			$query .= "FROM users ";
 			$query .= "WHERE username = '{$username}' ";
 			$query .= "AND hashed_password = '{$hashed_password}' ";
@@ -39,8 +39,11 @@
 				$found_user = mysql_fetch_array($result_set);
 				$_SESSION['user_id'] = $found_user['user_id'];
 				$_SESSION['username'] = $found_user['username'];
-				
-				redirect_to("staff.php");
+				$_SESSION['user_type'] = $found_user['user_type'];
+				if($_SESSION['user_type'] == 'admin')
+					redirect_to("staff.php");
+				else 
+					redirect_to("content.php");
 			} else {
 				// username/password combo was not found in the database
 				$message = "Username/password combination incorrect.<br />
@@ -85,8 +88,10 @@
 				<tr>
 					<td colspan="2"><input type="submit" name="submit" value="Login" /></td>
 				</tr>
+
 			</table>
 			</form>
+			<a href="add_user.php">Add User</a>
 		</td>
 	</tr>
 </table>

@@ -7,6 +7,8 @@
 	<tr>
 		<td id="navigation">
 			<?php echo public_navigation($sel_subject, $sel_page); ?>
+			<li><a href="login.php">Login</a></li>
+			<li><a href="add_user.php">Add User</a></li>
 		</td>
 		<td id="page">
 			<?php if ($sel_page) { ?>

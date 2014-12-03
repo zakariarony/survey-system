@@ -1,6 +1,7 @@
 <?php require_once("includes/session.php"); ?>
 <?php require_once("includes/functions.php"); ?>
 <?php confirm_logged_in(); ?>
+<?php is_admin(); ?>
 <?php include("includes/header.php"); ?>
 <table id="structure">
 	<tr>

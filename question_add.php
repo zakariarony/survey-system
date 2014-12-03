@@ -1,14 +1,23 @@
-<?php //require_once("includes/session.php"); ?>
+<?php require_once("includes/session.php"); ?>
 <?php require_once("includes/connection.php"); ?>
 <?php require_once("includes/functions.php"); ?>
-<?php// confirm_logged_in(); ?>
+<?php confirm_logged_in(); ?>
+<?php is_admin(); ?>
 <?php 
 	include_once("includes/form_functions.php");
-	
+	include("includes/header.php"); ?>
+<table id="structure">
+	<tr>
+		<td id="navigation">
+			<a href="staff.php">Return to Menu</a><br />
+			<br />
+		</td>
+		<td id="page">
+<?php	
 	// START FORM PROCESSING
 	if (isset($_POST['submit'])) { // Form has been submitted.
 		$errors = array();
-
+//echo '<pre/>'; print_r($_POST); exit;
 		// perform validations on the form data
 		$required_fields = array('question');
 		$errors = array_merge($errors, check_required_fields($required_fields, $_POST));
@@ -19,20 +28,34 @@
 		$question = trim(mysql_prep($_POST['question']));
         
        
-		if ( empty($errors) ) {
+		/*if ( empty($errors) ) {
              $question_set = mysql_query("SELECT * FROM survey_field", $connection);
 		if (!$question_set) {
 			die("Database query failed: " . mysql_error());
 		}while ($question_final = mysql_fetch_array($question_set)) {
 			$id_value=$question_final["survey_id"];
-        }
+        }*/
+        if (empty($errors) ) {
 			$query = "INSERT INTO survey_question (
-							survey_name,survey_id
+							survey_name,page_id
 						) VALUES (
-							'{$question}','{$id_value}'
+							'{$question}','{$_POST['page_id']}'
 						) ";
 			$result = mysql_query($query, $connection);
+
 			if ($result) {
+				$question_id = mysql_insert_id();
+
+				foreach ($_POST['answer'] as $key => $value) {
+	            	if (!empty($value)) {
+	            		$query = "INSERT INTO survey_question_answers (
+								question_id,answer,ans_type
+							) VALUES (
+								'{$question_id}','{$value}', '{$_POST['type']}'
+							) ";
+	                    $result = mysql_query($query, $connection);
+	            	}
+	            }
 				$message = "The Question was successfully created.";
 			} else {
 				$message = "The Question could not be created.";
@@ -48,73 +71,64 @@
                         $message = "There were " . count($errors) . " errors in the form.";
                     }
                 }
+
+       if (!empty($message)) {echo "<p class=\"message\">" . $message . "</p>";}
+	  if (!empty($errors)) { display_errors($errors); }
 	
 
  } 
 
         else { // Form has not been submitted.
-                $question = "";}
+                $question = "";
 ?>
-<?php include("includes/header.php"); ?>
-<table id="structure">
-	<tr>
-		<td id="navigation">
-			<a href="staff.php">Return to Menu</a><br />
-			<br />
-		</td>
-		<td id="page">
+
 			<h2>Create New Question</h2>
 			<?php if (!empty($message)) {echo "<p class=\"message\">" . $message . "</p>";} ?>
 			<?php if (!empty($errors)) { display_errors($errors); } ?>
-			<form action="question_update.php" method="post">
+			<form action="question_add.php" method="post">
 			<table>
-			    <?php $question = mysql_query("SELECT * FROM survey_question WHERE question_id = {$_GET['question_id']}", $connection);
-				      $question = mysql_fetch_array($question);
-
-				      $answers_set = mysql_query("SELECT * FROM survey_question_answers WHERE question_id = {$question['question_id']}", $connection);
-				 ?>
+			   
 				<tr>
 					<td>Question title:</td>
-					<td><input type="text" name="question" maxlength="30" value="<?php echo htmlentities($question['survey_name']); ?>" />
-					    <input type="hidden" name="question_id" value="<?php echo $question['question_id']; ?>" />
+					<td><input type="text" name="question" maxlength="30" value="" />
+					    <input type="hidden" name="page_id" value="<?php echo $_GET['page']; ?>" />
 					</td>
 				</tr>
-                <tr><td>question type: </td>
-					<td><select>
-					<?php foreach (['radio' => 'Radio Button', 'checkbox' => 'CheckBox', 'text' => 'Text'] as $key => $value) : ?>
-					  <option value="<?php echo $key?>" <?php if ($question['type'] == $key) echo 'selected'; ?>><?php echo $value?></option>
+               <tr><td>question type: </td>
+					<td><select name="type">
+					<?php foreach (['radio' => 'Radio Button', 'checkbox' => 'CheckBox'] as $key => $value) : ?>
+					  <option value="<?php echo $key?>"><?php echo $value?></option>
 					 <?php endforeach; ?>
 					</select> if see radio button just type "yes" or "no":</td>
 				</tr>
 				
-				<?php  $answer_no = 1;
-				    while ($answer = mysql_fetch_array($answers_set)) : ?>
-				<tr>
-					<td>Possible Answer <?php echo $answer_no++ ;?>:</td>
-					<td><input type="text" name="answer1" maxlength="30" value="<?php echo $answer['answer']; ?>" /></td>
-				</tr>
-			   <?php endwhile; ?>
+				<?php  $answer_no = 1; ?>
 				<tr>
 					<td>Possible Answer <?php echo $answer_no++ ;?> </td>
-					<td><input type="text" name="answer2" maxlength="30" value="<?php //echo htmlentities($question); ?>" /></td>
+					<td><input type="text" name="answer[]" maxlength="300" value="<?php //echo htmlentities($question); ?>" /></td>
 				</tr>
 				<tr>
 					<td>Possible Answer <?php echo $answer_no++ ;?></td>
-					<td><input type="text" name="answer3" maxlength="30" value="<?php //echo htmlentities($question); ?>" /></td>
+					<td><input type="text" name="answer[]" maxlength="300" value="<?php //echo htmlentities($question); ?>" /></td>
 				</tr>
 				<tr>
 					<td>Possible Answer <?php echo $answer_no++ ;?></td>
-					<td><input type="text" name="answer3" maxlength="30" value="<?php //echo htmlentities($question); ?>" /></td>
+					<td><input type="text" name="answer[]" maxlength="300" value="<?php //echo htmlentities($question); ?>" /></td>
 				</tr>
 				<tr>
 					<td>Possible Answer <?php echo $answer_no++ ;?></td>
-					<td><input type="text" name="answer3" maxlength="30" value="<?php //echo htmlentities($question); ?>" /></td>
+					<td><input type="text" name="answer[]" maxlength="300" value="<?php //echo htmlentities($question); ?>" /></td>
 				</tr>
 				<tr>
-					<td colspan="5"><input type="submit" name="submit" value="Edit question" /></td>
+					<td>Possible Answer <?php echo $answer_no++ ;?></td>
+					<td><input type="text" name="answer[]" maxlength="300" value="<?php //echo htmlentities($question); ?>" /></td>
+				</tr>
+				<tr>
+					<td colspan="5"><input type="submit" name="submit" value="ADD question" /></td>
 				</tr>
 			</table>
 			</form>
+			<?php } ?>
 		</td>
 	</tr>
 </table>
